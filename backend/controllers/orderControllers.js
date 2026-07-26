@@ -48,7 +48,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
 const getMyOrders = asyncHandler(async (req, res) => {
     const { _id } = req.user
     const orders = await orderModel.find({ user: _id })
-    res.status(200).json({ orders, message: `All Orders for user ${_id}` })
+    res.status(200).json(orders)
 })
 
 // @desc       Get Order By Id
@@ -87,7 +87,6 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
         const updatedOrder = await order.save()
         res.status(200).json({
             updatedOrder,
-            message: `Payment status updated for Order ${id}`,
         })
     } else {
         res.status(404)
