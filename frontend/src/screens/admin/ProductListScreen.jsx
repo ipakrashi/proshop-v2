@@ -63,6 +63,7 @@ const ProductListScreen = () => {
                                 <th>ID</th>
                                 <th>Name</th>
                                 <th>Price</th>
+                                <th>In Stock</th>
                                 <th>Category</th>
                                 <th>Brand</th>
                                 <th>Edit / Delete</th>
@@ -74,11 +75,12 @@ const ProductListScreen = () => {
                                     <td>{product._id}</td>
                                     <td>{product.name}</td>
                                     <td>{product.price}</td>
+                                    <td>{product.countInStock}</td>
                                     <td>{product.category}</td>
                                     <td>{product.brand}</td>
                                     <td>
                                         <LinkContainer
-                                            to={`admin/product/${product._id}/edit`}
+                                            to={`/admin/product/${product._id}/edit`}
                                         >
                                             <Button
                                                 variant='light'

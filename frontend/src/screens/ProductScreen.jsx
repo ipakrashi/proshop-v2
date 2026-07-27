@@ -7,13 +7,12 @@ import { useGetProductByIdQuery } from '../slices/productApiSlice'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import { addToCart } from '../slices/cartSlice'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 const ProductScreen = () => {
     const [qty, setQty] = useState(1)
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const { cartItems } = useSelector((state) => state.cartR)
     const { id: productId } = useParams()
 
     const {
