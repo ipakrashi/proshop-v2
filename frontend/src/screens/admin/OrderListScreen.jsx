@@ -4,7 +4,6 @@ import Message from '../../components/Message'
 import Loader from '../../components/Loader'
 import { useGetOrdersQuery } from '../../slices/ordersApiSlice'
 import { Button, Table } from 'react-bootstrap'
-import userEvent from '@testing-library/user-event'
 import { FaTimes } from 'react-icons/fa'
 
 const OrderListScreen = () => {
@@ -46,7 +45,7 @@ const OrderListScreen = () => {
                                 <td>
                                     {order.isDelivered ? (
                                         <>
-                                            {order.isDelivered.substring(0, 10)}
+                                            {order.deliveredAt.substring(0, 10)}
                                         </>
                                     ) : (
                                         <FaTimes style={{ color: 'red' }} />
