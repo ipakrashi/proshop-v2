@@ -120,7 +120,7 @@ const updateOrderToDelivered = asyncHandler(async (req, res) => {
 // @access    Private/Admin
 const getOrders = asyncHandler(async (req, res) => {
     const orders = await orderModel.find({}).populate('user', 'name email')
-    res.status(200).json({ orders, message: 'Get All Orders by Admin' })
+    res.status(200).json(orders)
 })
 
 export {
