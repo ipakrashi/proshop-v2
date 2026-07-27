@@ -1,17 +1,40 @@
 import React from 'react'
-import { useGetProductsQuery } from '../../slices/productApiSlice.js'
+import {
+    useCreateProductMutation,
+    useGetProductsQuery,
+} from '../../slices/productApiSlice.js'
 import { Button, Col, Row, Table } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
 import { FaEdit, FaTrash } from 'react-icons/fa'
 import Loader from '../../components/Loader.jsx'
 import Message from '../../components/Message.jsx'
+import { toast } from 'react-toastify'
 
 const ProductListScreen = () => {
-    const { data: products, isLoading, error } = useGetProductsQuery()
+    const { data: products, isLoading, error, refetch } = useGetProductsQuery()
+
+    const [createProduct, { isLoading: loadingCreate }] =
+        useCreateProductMutation()
 
     const deleteHandler = async (id) => {
         alert('ID: ' + id)
     }
+
+    const createProductHandler = async () => {
+        if (
+            window.confirm(
+                'Are you sure that you want to create a new product?',
+            )
+        ) {
+            try {
+                await createProduct()
+                refetch()
+            } catch (error) {
+                toast.error(error?.data.message || error.message)
+            }
+        }
+    }
+
     return (
         <>
             <Row className='align-items-center'>
@@ -19,11 +42,15 @@ const ProductListScreen = () => {
                     <h1>Products</h1>
                 </Col>
                 <Col className='text-end'>
-                    <Button className='btn-sm m-3'>
+                    <Button
+                        className='btn-sm m-3'
+                        onClick={createProductHandler}
+                    >
                         <FaEdit /> Create Product
                     </Button>
                 </Col>
             </Row>
+            {loadingCreate && <Loader />}
             {isLoading ? (
                 <Loader />
             ) : error ? (
@@ -38,7 +65,7 @@ const ProductListScreen = () => {
                                 <th>Price</th>
                                 <th>Category</th>
                                 <th>Brand</th>
-                                <th></th>
+                                <th>Edit / Delete</th>
                             </tr>
                         </thead>
                         <tbody>
