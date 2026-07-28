@@ -1,6 +1,7 @@
 import React from 'react'
 import {
     useCreateProductMutation,
+    useDeleteProductMutation,
     useGetProductsQuery,
 } from '../../slices/productApiSlice.js'
 import { Button, Col, Row, Table } from 'react-bootstrap'
@@ -16,8 +17,19 @@ const ProductListScreen = () => {
     const [createProduct, { isLoading: loadingCreate }] =
         useCreateProductMutation()
 
+    const [deleteProduct, { isLoading: loadingDelete }] =
+        useDeleteProductMutation()
+
     const deleteHandler = async (id) => {
-        alert('ID: ' + id)
+        if (window.confirm('Are you sure ?')) {
+            try {
+                await deleteProduct(id)
+                toast.success('Product Deleted')
+                refetch()
+            } catch (error) {
+                toast.error(error?.data?.message || error.error)
+            }
+        }
     }
 
     const createProductHandler = async () => {
@@ -28,6 +40,7 @@ const ProductListScreen = () => {
         ) {
             try {
                 await createProduct()
+                toast.success('Product Created')
                 refetch()
             } catch (error) {
                 toast.error(error?.data.message || error.message)
@@ -51,6 +64,7 @@ const ProductListScreen = () => {
                 </Col>
             </Row>
             {loadingCreate && <Loader />}
+            {loadingDelete && <Loader />}
             {isLoading ? (
                 <Loader />
             ) : error ? (

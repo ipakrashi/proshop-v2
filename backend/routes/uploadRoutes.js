@@ -30,9 +30,11 @@ function checkFileType(file, cb) {
 
 const upload = multer({ storage })
 router.post('/', upload.single('image'), (req, res) => {
+    const normalizedPath = req.file.path.replace(/\//g, '\\')
+    const imagePath = `\\${normalizedPath}`
     res.send({
         message: 'Image Uploaded Successfully',
-        image: `${req.file.path}`,
+        image: imagePath,
     })
 })
 export default router
