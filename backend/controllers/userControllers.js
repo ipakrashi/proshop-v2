@@ -149,31 +149,67 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 //  route             POST  /api/users/
 //  @access         Private/Admin
 const getUsers = asyncHandler(async (req, res) => {
-    return res.status(200).json({ message: 'Get All Users by Admin' })
+    const users = await userModel.find({})
+    return res.status(200).json(users)
 })
 
 // @desc           Delete Users
 //  route             DELETE  /api/users/:id
 //  @access         Private/Admin
 const deleteUsers = asyncHandler(async (req, res) => {
-    const { id } = req.params
-    return res.status(200).json({ message: 'User Deleted by Admin', id })
+    const user = await userModel.findById(req.params.id).select('-password')
+    if (user) {
+        // Prevent an admin from deleting their own account
+        if (user._id.toString() === req.user._id.toString()) {
+            res.status(400)
+            throw new Error('You cannot delete your own admin account')
+        }
+        const deletedUser = await userModel.deleteOne({ _id: user._id })
+        res.status(200).json({ message: 'User removed successfully' })
+    } else {
+        res.status(404)
+        throw new Error('User not found')
+    }
 })
 
 // @desc           Get Users by ID
 //  route             GET  /api/users/:id
 //  @access         Private/Admin
 const getUserByID = asyncHandler(async (req, res) => {
-    const { id } = req.params
-    return res.status(200).json({ message: 'Get Users by Id', id })
+    const user = await userModel.findById(req.params.id).select('-password')
+    if (user) {
+        return res.status(200).json(user)
+    } else {
+        res.status(404)
+        throw new Error('User not found')
+    }
 })
 
 // @desc           Update Users
 //  route             PUT  /api/users/:id
 //  @access         Private/Admin
 const updateUser = asyncHandler(async (req, res) => {
-    const { id } = req.params
-    return res.status(200).json({ message: 'User Updated by Admin', id })
+    const user = await userModel.findById(req.params.id)
+    if (user) {
+        // 1. Update properties if provided in body, otherwise keep existing values
+        user.name = req.body.name || user.name
+        user.email = req.body.email || user.email
+        // Use boolean check because req.body.isAdmin can be false
+        if (req.body.isAdmin !== undefined) {
+            user.isAdmin = Boolean(req.body.isAdmin)
+        }
+        // 2. Save changes to MongoDB
+        const updatedUser = await user.save()
+        res.status(200).json({
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            isAdmin: updatedUser.isAdmin,
+        })
+    } else {
+        res.status(404)
+        throw new Error('User not found')
+    }
 })
 
 export {
