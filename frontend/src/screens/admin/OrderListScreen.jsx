@@ -20,13 +20,15 @@ const OrderListScreen = () => {
             ) : (
                 <Table striped bordered hover responsive className='table-sm'>
                     <thead>
-                        <th>ID</th>
-                        <th>User</th>
-                        <th>Date</th>
-                        <th>Total</th>
-                        <th>Paid</th>
-                        <th>Delivered</th>
-                        <th>Order Details</th>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Paid</th>
+                            <th>Delivered</th>
+                            <th>Order Details</th>
+                        </tr>
                     </thead>
                     <tbody>
                         {orders.map((order) => (
