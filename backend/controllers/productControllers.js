@@ -5,12 +5,21 @@ import productModel from '../models/productModel.js'
 //  route             GET /api/products/
 //  @access         Public
 const getProducts = asyncHandler(async (req, res) => {
-    const products = await productModel.find({})
+    const pageSize = 4
+    const page = Number(req.query.pageNumber) || 1
+    const count = await productModel.countDocuments()
+
+    const products = await productModel
+        .find({})
+        .limit(pageSize)
+        .skip(pageSize * (page - 1))
 
     if (!products) {
         return res.status(500).json({ message: error.message })
     } else {
-        return res.status(200).json(products)
+        return res
+            .status(200)
+            .json({ products, page, pages: Math.ceil(count / pageSize) })
     }
 })
 
