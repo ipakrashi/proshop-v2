@@ -128,8 +128,19 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         user.name = req.body.name || user.name
         user.email = req.body.email || user.email
 
-        if (req.body.password) {
-            user.password = req.body.password
+        // if (req.body.password) {
+        //     user.password = req.body.password
+        // }
+
+        // Only update password if a non-empty string is sent
+        if (req.body.password && req.body.password.trim() !== '') {
+            const isSamePassword = await bcrypt.compare(
+                req.body.password,
+                user.password,
+            )
+            if (!isSamePassword) {
+                user.password = await bcrypt.hash(req.body.password, 10)
+            }
         }
         const updatedUser = await user.save()
         return res.status(200).json({
@@ -190,26 +201,47 @@ const getUserByID = asyncHandler(async (req, res) => {
 //  @access         Private/Admin
 const updateUser = asyncHandler(async (req, res) => {
     const user = await userModel.findById(req.params.id)
-    if (user) {
-        // 1. Update properties if provided in body, otherwise keep existing values
-        user.name = req.body.name || user.name
-        user.email = req.body.email || user.email
-        // Use boolean check because req.body.isAdmin can be false
-        if (req.body.isAdmin !== undefined) {
-            user.isAdmin = Boolean(req.body.isAdmin)
-        }
-        // 2. Save changes to MongoDB
-        const updatedUser = await user.save()
-        res.status(200).json({
-            _id: updatedUser._id,
-            name: updatedUser.name,
-            email: updatedUser.email,
-            isAdmin: updatedUser.isAdmin,
-        })
-    } else {
+
+    if (!user) {
         res.status(404)
         throw new Error('User not found')
     }
+    // Prevent admin from removing their own admin status
+    if (
+        user._id.toString() === req.user._id.toString() &&
+        req.body.isAdmin === false
+    ) {
+        res.status(400)
+        throw new Error('You cannot remove your own admin privileges')
+    }
+    // Update basic fields if provided
+    user.name = req.body.name || user.name
+    user.email = req.body.email || user.email
+
+    // Only update password if a non-empty string is sent
+    if (req.body.password && req.body.password.trim() !== '') {
+        const isSamePassword = await bcrypt.compare(
+            req.body.password,
+            user.password,
+        )
+        if (!isSamePassword) {
+            user.password = await bcrypt.hash(req.body.password, 10)
+        }
+    }
+
+    // Explicitly update boolean field
+    if (req.body.isAdmin !== undefined) {
+        user.isAdmin = Boolean(req.body.isAdmin)
+    }
+
+    const updatedUser = await user.save()
+
+    res.status(200).json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        isAdmin: updatedUser.isAdmin,
+    })
 })
 
 export {

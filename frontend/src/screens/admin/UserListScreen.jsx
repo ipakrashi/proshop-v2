@@ -21,8 +21,8 @@ const UserListScreen = () => {
                 await deleteUser(id).unwrap()
                 toast.success('User Deleted Successfully')
                 refetch()
-            } catch (error) {
-                toast.error(error.message)
+            } catch (err) {
+                toast.error(err?.data?.message || err.error)
             }
         }
     }
