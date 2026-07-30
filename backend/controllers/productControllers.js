@@ -139,7 +139,19 @@ const createProductReview = asyncHandler(async (req, res) => {
         throw new Error('Product not found')
     }
 })
+// @desc            Get Top Rated Products
+//  route             GET /api/products/top
+//  @access         Public
+const getTopProducts = asyncHandler(async (req, res) => {
+    const products = await productModel.find({}).sort({ rating: -1 }).limit(3)
 
+    if (!products) {
+        res.status(404)
+        throw new Error('Resource not found')
+    } else {
+        return res.status(200).json(products)
+    }
+})
 export {
     getProducts,
     getProductById,
@@ -147,4 +159,5 @@ export {
     updateProduct,
     deleteProduct,
     createProductReview,
+    getTopProducts,
 }
